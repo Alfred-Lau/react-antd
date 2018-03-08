@@ -1,70 +1,59 @@
+import { Table, Icon, Divider } from 'antd'
 import React from 'react'
-import { Card } from 'antd';
 
-import 'antd/dist/antd.css'
+import reqwest from 'reqwest'
 
-const tabList = [{
-  key: 'tab1',
-  tab: 'tab1',
+import '../node_modules/antd/dist/antd.css'
+import './App.css'
+
+const columns = [{
+  title: 'Name',
+  dataIndex: 'name',
+  key: 'name',
+  render: text => <a href='#'>{text}</a>
 }, {
-  key: 'tab2',
-  tab: 'tab2',
-}];
-
-const contentList = {
-  tab1: <p>content1</p>,
-  tab2: <p>content2</p>,
-};
-
-const tabListNoTitle = [{
-  key: 'article',
-  tab: 'article',
+  title: 'Age',
+  dataIndex: 'age',
+  key: 'age'
 }, {
-  key: 'app',
-  tab: 'app',
+  title: 'Address',
+  dataIndex: 'address',
+  key: 'address'
 }, {
-  key: 'project',
-  tab: 'project',
-}];
+  title: 'Action',
+  key: 'action',
+  render: (text, record) => (
+    <span><a href='#'>Action 一 {record.name}</a> <Divider type='vertical' /> <a href='#'>Delete</a> <Divider type='vertical' /> <a href='#' className='ant-dropdown-link'>More actions <Icon type='down' /></a></span>
+  )
+}]
 
-const contentListNoTitle = {
-  article: <p>article content</p>,
-  app: <p>app content</p>,
-  project: <p>project content</p>,
-};
 
-class TabsCard extends React.Component {
+
+
+class App extends React.Component{
+  
   state = {
-    key: 'tab1',
-    noTitleKey: 'article',
+    data: []
   }
-  onTabChange = (key, type) => {
-    console.log(key, type);
-    this.setState({ [type]: key });
+  
+  fetch = () => {
+    const api = 'http://localhost:3030/'
+    reqwest(api).then((data)=>{
+      console.log(data)
+    })
   }
+  
+  componentDidMount() {
+    this.fetch()
+  }
+  
   render() {
     return (
-      <div>
-        <Card
-          style={{ width: '100%' }}
-          title="Card title"
-          extra={<a href="#">More</a>}
-          tabList={tabList}
-          onTabChange={(key) => { this.onTabChange(key, 'key'); }}
-        >
-          {contentList[this.state.key]}
-        </Card>
-        <br /><br />
-        <Card
-          style={{ width: '100%' }}
-          tabList={tabListNoTitle}
-          onTabChange={(key) => { this.onTabChange(key, 'noTitleKey'); }}
-        >
-          {contentListNoTitle[this.state.noTitleKey]}
-        </Card>
+      <div className="app">
+        <Table/>
       </div>
-    );
+    )
   }
-}
+}  
 
-export default TabsCard
+export default App

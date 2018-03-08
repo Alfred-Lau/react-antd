@@ -1,6 +1,10 @@
-.App{
-  /* text-align: center; */
+.app{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+
+
+
+  /* width: 240px;
+  margin: 0 auto; */
 }

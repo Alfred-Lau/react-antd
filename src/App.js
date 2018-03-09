@@ -34,7 +34,7 @@ class App extends React.Component{
   
   state = {
     data: [],
-    selectedRowKeys:[]
+    selectedRowKeys:[] //设置默认值
   }
   
   fetch = () => {
@@ -68,6 +68,22 @@ class App extends React.Component{
     
     // 联动选择框配置该项
     const rowSelection = {
+      // 通过 rowSelection.selections 自定义选择项，默认不显示下拉选项，设为 true 时显示默认选择项。
+      selections: [{
+        key: 'odd',
+        text: 'select odd idnex',
+        onSelect: (keys) => {
+          console.log(keys)
+          let newKsys = keys.filter((key) => {
+            return key % 2 === 0 ? true : false 
+          }) 
+          this.setState({
+            selectedRowKeys:newKsys
+          })
+        }
+      }],
+      // onSelection : this.onSelection,//有什么用？
+      hideDefaultSelections:true,
       // rowSelection.selectedRowKeys 来控制选中项
       selectedRowKeys,
       // 选择框被选择事件

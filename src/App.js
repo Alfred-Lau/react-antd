@@ -1,4 +1,4 @@
-import { Table, Icon, Divider } from 'antd'
+import { Table, Icon, Divider, Button } from 'antd'
 import React from 'react'
 
 import reqwest from 'reqwest'
@@ -33,7 +33,8 @@ const columns = [{
 class App extends React.Component{
   
   state = {
-    data: []
+    data: [],
+    selectedRowKeys:[]
   }
   
   fetch = () => {
@@ -48,13 +49,32 @@ class App extends React.Component{
   componentDidMount() {
     this.fetch()
   }
+
+  start = () => {
+    this.setState({
+      loading: true
+    })
+
+    setTimeout(() => {
+      this.setState({
+        loading: false,
+        selectedRowKeys:[]
+      })
+    }, 5000);
+  }
   
   render() {
+    const { loading, selectedRowKeys } = this.state
+    
     // 联动选择框配置该项
     const rowSelection = {
+      // rowSelection.selectedRowKeys 来控制选中项
+      selectedRowKeys,
       // 选择框被选择事件
       onChange: (keys, rows) => {
-        console.log(keys, rows)
+        this.setState({
+          selectedRowKeys:keys
+        })
       },
       // 测试每一项的属性
       getCheckboxProps: record => (
@@ -64,8 +84,23 @@ class App extends React.Component{
         }
       )
     }
+    const hasSelected = selectedRowKeys.length > 0 ? true:false
+
     return (
-      <div className="app">
+      <div className="app">  
+        <div style={{marginBottom:16,marginTop:16}}>
+          <Button
+            type='primary'
+            onClick={this.start}
+            loading={loading}
+            disabled={!hasSelected}
+          >
+          Reload
+          </Button>
+          <span style={{marginLeft:8}}>
+            {`一共选择了${this.state.selectedRowKeys.length}条数据`}
+          </span>
+        </div>
         <Table
           dataSource={this.state.data}
           columns={columns}

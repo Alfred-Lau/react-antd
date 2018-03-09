@@ -10,7 +10,7 @@ const columns = [{
   title: 'Name',
   dataIndex: 'name',
   key: 'name',
-  render: text => <a href='#'>{text}</a>
+  render: text => <a href=''>{text}</a>
 }, {
   title: 'Age',
   dataIndex: 'age',
@@ -23,7 +23,7 @@ const columns = [{
   title: 'Action',
   key: 'action',
   render: (text, record) => (
-    <span><a href='#'>Action 一 {record.name}</a> <Divider type='vertical' /> <a href='#'>Delete</a> <Divider type='vertical' /> <a href='#' className='ant-dropdown-link'>More actions <Icon type='down' /></a></span>
+    <span><a href=''>Action 一 {record.name}</a> <Divider type='vertical' /> <a href=''>Delete</a> <Divider type='vertical' /> <a href='' className='ant-dropdown-link'>More actions <Icon type='down' /></a></span>
   )
 }]
 
@@ -39,7 +39,9 @@ class App extends React.Component{
   fetch = () => {
     const api = 'http://localhost:3030/'
     reqwest(api).then((data)=>{
-      console.log(data)
+      this.setState({
+        data:data.data
+      })
     })
   }
   
@@ -48,9 +50,27 @@ class App extends React.Component{
   }
   
   render() {
+    // 联动选择框配置该项
+    const rowSelection = {
+      // 选择框被选择事件
+      onChange: (keys, rows) => {
+        console.log(keys, rows)
+      },
+      // 测试每一项的属性
+      getCheckboxProps: record => (
+        {
+          name: record.name,
+          disabled: record.name === 'alf lau'
+        }
+      )
+    }
     return (
       <div className="app">
-        <Table/>
+        <Table
+          dataSource={this.state.data}
+          columns={columns}
+          rowSelection={rowSelection}
+        />
       </div>
     )
   }

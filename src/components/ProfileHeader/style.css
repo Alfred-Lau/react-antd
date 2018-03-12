@@ -1,0 +1,26 @@
+
+/* 实现fixed的策略：使用fixed定位和z-index最前面，下面接着的元素，padding-top设置那么高 */
+.container{
+    position: fixed;
+    width: 100%;
+    background: #21232A;
+    height:50px;
+    line-height: 50px;
+    padding: 0 20px;
+    color: #FFFFFF;
+    z-index: 1000;
+}
+
+ul.profile-header-ul {
+    display: inline-block;
+    margin-left: 20px;    
+}
+.item{
+    display: inline-block;
+    padding-right: 10px;    
+}
+
+.container .github{
+    position: relative;
+    left: 100px;
+}

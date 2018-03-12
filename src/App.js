@@ -1,79 +1,28 @@
-import { Table, Icon, Divider, Button, message, notification, Avatar, Popover, Rate, Modal, Form, Input, Checkbox } from 'antd'
+import {
+  Table,
+  Icon,
+  Divider,
+  Button,
+  message,
+  notification,
+  Avatar,
+  Popover,
+  Rate,
+  Modal,
+  Spin,
+  Breadcrumb,
+  Row,
+  Col
+} from 'antd'
 import React from 'react'
 import reqwest from 'reqwest'
 
 import '../node_modules/antd/dist/antd.css'
 import './App.css'
 
-const FormItem = Form.Item;
+import WrappedNormalLoginForm from './containers/WrappedNormalLoginForm'
 
-class WrapperForm extends React.Component{
-
-handleSubmit = (e) => {
-  e.preventDefault();
-  this
-    .props
-    .form
-    .validateFields((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      reqwest({
-        url: 'http://localhost:3030/login',
-        method: 'post',
-        data: values,
-        success: (res) => {
-          
-          if (res === 'success') {
-            console.log(res)
-          }
-        },
-        error: (err) => {
-          console.log(err)
-        }
-    })
-      }
-    });
-}
-  
-  render() {
-    const { getFieldDecorator } = this.props.form;
-    
-    return (
-      <Form onSubmit={this.handleSubmit} className="login-form">
-        <FormItem>
-          {getFieldDecorator('userName', {
-            rules: [{ required: true, message: 'Please input your username!' }],
-          })(
-            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
-          )}
-        </FormItem>
-        <FormItem>
-          {getFieldDecorator('password', {
-            rules: [{ required: true, message: 'Please input your Password!' }],
-          })(
-            <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
-          )}
-        </FormItem>
-        <FormItem>
-          {getFieldDecorator('remember', {
-            valuePropName: 'checked',
-            initialValue: true,
-          })(
-            <Checkbox>Remember me</Checkbox>
-          )}
-          <a className="login-form-forgot" href="">Forgot password</a>
-          <Button type="primary" htmlType="submit" className="login-form-button">
-            登录
-          </Button>
-          Or <a href="">register now!</a>
-        </FormItem>
-      </Form>
-    )
-  }
-}
-
-
-const WrappedNormalLoginForm = Form.create()(WrapperForm);
+import {Link} from 'react-router-dom'
 
 class App extends React.Component{
   
@@ -84,14 +33,21 @@ class App extends React.Component{
     data: [],
     selectedRowKeys: [], //设置默认值
     filterInfo:null,
-    sortOrder: null
+    sortOrder: null,
+    spinning: true
+  }
+
+  getChildContext() {
+    return {
+    }
   }
   
   fetch = () => {
     const api = 'http://localhost:3030/'
     reqwest(api).then((data)=>{
       this.setState({
-        data
+        data,
+        spinning:false
       })
     })
   }
@@ -191,6 +147,11 @@ class App extends React.Component{
     })
   }
 
+  authorize = () => {
+    this.setState({
+      visible:false
+    })
+  }
   render() {
     let { selectedRowKeys, filterInfo, sortOrder, visible, loading } = this.state
 
@@ -271,9 +232,8 @@ class App extends React.Component{
     ]
     const content = (
         <div>
-          <p>
             <Rate allowHalf defaultValue={2.5} />
-          </p>
+            <p><Link to='/profile'>Profile</Link></p>
           <p>
           <Button type='default' onClick={this.toggleLogin}>
             {this.state.isLogin
@@ -285,9 +245,42 @@ class App extends React.Component{
         </div>
     )
 
+    // customize the spin icon
+    const SpinIcon = <Icon type='loading' style={{ fontSize:24 }} spin/>
+
 
     return (
       <div className="app">  
+        <Row>
+          <Col>
+          <Popover
+            content={content}
+            title={this.state.isLogin
+              ? `当前登录用户：${title}`
+              :'未登录'              
+            }>
+          <Avatar
+            src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
+            className='avatar'
+            ></Avatar>
+          </Popover>
+          </Col>
+        </Row>  
+        <Breadcrumb
+ 
+        >
+          <Breadcrumb.Item>
+            <Icon type='home'></Icon>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Icon type='user'></Icon>
+            <span>Personal Proj</span>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <span>app</span>
+          </Breadcrumb.Item>  
+        </Breadcrumb>  
+          
         <div style={{marginBottom:16,marginTop:16}}>
           <Button
             type='primary'
@@ -304,24 +297,21 @@ class App extends React.Component{
           <Button type='default' style={{ marginRight: 10, marginLeft: 10 }} onClick={this.clearFilter}>clear filter</Button>
           <Button type='default' onClick={this.clearAll}>clear all</Button>
           <Button type='primary' style={{ marginLeft: 10, marginRight: 10 }} onClick={this.generateRandom}>生成随机数据</Button>
-          <Popover
-            content={content}
-            title={this.state.isLogin
-              ? `当前登录用户：${title}`
-              :'未登录'              
-            }>
-          <Avatar
-            src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
-            className='avatar'
-            ></Avatar>
-          </Popover>  
-        </div>
-        <Table
+          
+        </div> 
+        <Spin
+          delay={3000}
+          spinning={this.state.spinning}
+          tip='data is mining'
+          indicator={SpinIcon}
+        >
+          <Table
           dataSource={this.state.data}
           columns={columns}
           rowSelection={rowSelection}
           onChange={this.handleChange}
-        />
+          />
+        </Spin>
 
         <Modal
           visible={visible}
@@ -330,11 +320,14 @@ class App extends React.Component{
           footer={null}
           className='modal-outside'
         >   
-        <WrappedNormalLoginForm></WrappedNormalLoginForm>  
+          <WrappedNormalLoginForm loginFn={this.authorize}></WrappedNormalLoginForm>  
         </Modal>
       </div>
     )
   }
 }  
+
+App.childContextTypes = {
+}
 
 export default App
